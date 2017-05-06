@@ -41,7 +41,7 @@ print ("test and training data loaded")
 data = tf.placeholder(tf.float32, [None, 20,1]) #Number of examples, number of input, dimension of each input
 target = tf.placeholder(tf.float32, [None, 21])
 num_hidden = 24
-cell = tf.nn.rnn_cell.LSTMCell(num_hidden,state_is_tuple=True)
+cell = tf.contrib.rnn.BasicLSTMCell(num_hidden,state_is_tuple=True)
 val, _ = tf.nn.dynamic_rnn(cell, data, dtype=tf.float32)
 val = tf.transpose(val, [1, 0, 2])
 last = tf.gather(val, int(val.get_shape()[0]) - 1)
@@ -54,13 +54,13 @@ minimize = optimizer.minimize(cross_entropy)
 mistakes = tf.not_equal(tf.argmax(target, 1), tf.argmax(prediction, 1))
 error = tf.reduce_mean(tf.cast(mistakes, tf.float32))
 
-init_op = tf.initialize_all_variables()
+init_op = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init_op)
 
 batch_size = 1000
-no_of_batches = int(len(train_input)) / batch_size
-epoch = 5000
+no_of_batches = int(len(train_input) / batch_size)
+epoch = 50
 for i in range(epoch):
     ptr = 0
     for j in range(no_of_batches):
