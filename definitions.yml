@@ -1,0 +1,6 @@
+sequence_length: 3
+number_of_features: 25
+data_size: 5
+sequence_time_diff: 3
+label_time_diff: 24
+number_hidden: 5
