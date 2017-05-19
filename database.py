@@ -3,7 +3,7 @@ import numpy as np
 class FeatureVector(object):
 
 	def __init__(self, data):
-		self._data = data
+		self._features = data
 		self._ID = data[0]
 		self._date = [d for d in data[1:4]]
 		self._time = [d for d in data[4:7]]
@@ -12,16 +12,16 @@ class FeatureVector(object):
 		return 'ID: {0}'.format(self.ID)
 
 	@property
-	def data(self):
+	def features(self):
 		return self._data
 
-	@data.setter
-	def data(self, value):
-		self.data = value
+	@features.setter
+	def features(self, value):
+		self.features = value
 
 	@property
 	def date(self):
-		self._date
+		 return self._date
 
 	@date.setter
 	def date(self, value):
@@ -66,14 +66,15 @@ class DataStruct(object):
 		self._labels = []
 		for data_piece, label in zip(data, labels):
 			self._data.append(InfoMatrix(data_piece))
-			self._labels.append(InfoMatrix(label))
+			self._labels.append(FeatureVector(label))
+			pass
 
 	def __iter__(self):
 		return iter(zip(self.data, self.labels))
 
 	@property
 	def data(self):
-	    self._data
+	    return self._data
 
 	@property
 	def labels(self):
@@ -83,9 +84,6 @@ class DataStruct(object):
 		pass
 
 	def get_batch(self):
-		pass
-
-	def tensor_output(self):
 		pass
 
 	def normalize(self):
