@@ -1,13 +1,10 @@
 import numpy as np
 import math
 from random import randint
-conf = {
-	'sequence_length': 3,
-	'number_of_features': 25,
-    'data_size': 5,
-    'sequence_time_diff': 3,
-    'label_time_diff': 24
-}
+import yaml
+
+with open('definitions.yml', 'r') as f:
+    conf = yaml.load(f)
 
 def generate_data():
     data = np.zeros((conf['data_size'], conf['sequence_length'], conf['number_of_features']), dtype = np.float16)

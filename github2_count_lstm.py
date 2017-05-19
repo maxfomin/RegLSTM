@@ -7,7 +7,7 @@ import tensorflow as tf
 # from tensorflow.models.rnn import rnn_cell
 # from tensorflow.models.rnn import rnn
 
-NUM_EXAMPLES = 10000
+NUM_EXAMPLES = 1000
 
 train_input = ['{0:020b}'.format(i) for i in range(2**20)]
 shuffle(train_input)

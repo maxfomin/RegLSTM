@@ -67,7 +67,8 @@ class DataStruct(object):
 		for data_piece, label in zip(data, labels):
 			self._data.append(InfoMatrix(data_piece))
 			self._labels.append(FeatureVector(label))
-			pass
+
+		self.normalize()
 
 	def __iter__(self):
 		return iter(zip(self.data, self.labels))
