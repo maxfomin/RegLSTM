@@ -3,10 +3,8 @@ import math
 from random import randint
 import yaml
 
-with open('definitions.yml', 'r') as f:
-    conf = yaml.load(f)
 
-def generate_data():
+def generate_data(conf):
     data = np.zeros((conf['data_size'], conf['sequence_length'], conf['number_of_features']), dtype = np.float16)
     labels = np.zeros((conf['data_size'], conf['number_of_features']), dtype = np.float16)
     function_pool = [math.sin, math.cos, math.tan]
