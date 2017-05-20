@@ -1,16 +1,15 @@
 import numpy as np
 import math
 from random import randint
-import yaml
 
 
 def generate_data(conf):
-    data = np.zeros((conf['data_size'], conf['sequence_length'], conf['number_of_features']), dtype = np.float16)
-    labels = np.zeros((conf['data_size'], conf['number_of_features']), dtype = np.float16)
+    data = np.zeros((conf['data_size'], conf['sequence_length'], conf['number_features']), dtype = np.float16)
+    labels = np.zeros((conf['data_size'], conf['number_features']), dtype = np.float16)
     function_pool = [math.sin, math.cos, math.tan]
     function_number = [1, 2]
 
-    for ind_feature in range(conf['number_of_features']):
+    for ind_feature in range(conf['number_features']):
         gen_number = randint(1, len(function_number))
         gen_function = [randint(0, len(function_pool) - 1) for i in range(gen_number + 1)]
         gen_amp = randint(1, 10)

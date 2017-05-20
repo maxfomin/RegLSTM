@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 class FeatureVector(object):
 
@@ -64,14 +65,15 @@ class DataStruct(object):
 	def __init__(self, data, labels):
 		self._data = []
 		self._labels = []
+		self._test_size = int(conf['data_size'] * conf['test_percentage'])
 		for data_piece, label in zip(data, labels):
 			self._data.append(InfoMatrix(data_piece))
 			self._labels.append(FeatureVector(label))
 
+		random_seed = random.random()
+		random.shuffle(self._data, lambda: random_seed)
+		random.shuffle(self._labels, lambda: random_seed)
 		self.normalize()
-
-	def __iter__(self):
-		return iter(zip(self.data, self.labels))
 
 	@property
 	def data(self):
@@ -81,11 +83,18 @@ class DataStruct(object):
 	def labels(self):
 		return self._labels
 
+	@property
+	def test_size(self):
+		return self._test_size
+
 	def shuffle(self):
 		pass
 
 	def get_batch(self):
 		pass
+
+	def get_test(self):
+		return self.data[:self.test_size], self.labels[:self.test_size]
 
 	def normalize(self):
 		pass

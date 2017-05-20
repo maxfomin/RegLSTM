@@ -9,33 +9,33 @@ import tensorflow as tf
 
 NUM_EXAMPLES = 1000
 
-train_input = ['{0:020b}'.format(i) for i in range(2**20)]
-shuffle(train_input)
-train_input = [map(int,i) for i in train_input]
-ti  = []
-for i in train_input:
-    temp_list = []
-    for j in i:
-            temp_list.append([j])
-    ti.append(np.array(temp_list))
-train_input = ti
-
-train_output = []
-for i in train_input:
-    count = 0
-    for j in i:
-        if j[0] == 1:
-            count+=1
-    temp_list = ([0]*21)
-    temp_list[count]=1
-    train_output.append(temp_list)
-
-test_input = train_input[NUM_EXAMPLES:]
-test_output = train_output[NUM_EXAMPLES:]
-train_input = train_input[:NUM_EXAMPLES]
-train_output = train_output[:NUM_EXAMPLES]
-
-print ("test and training data loaded")
+# train_input = ['{0:020b}'.format(i) for i in range(2**20)]
+# shuffle(train_input)
+# train_input = [map(int,i) for i in train_input]
+# ti  = []
+# for i in train_input:
+#     temp_list = []
+#     for j in i:
+#             temp_list.append([j])
+#     ti.append(np.array(temp_list))
+# train_input = ti
+#
+# train_output = []
+# for i in train_input:
+#     count = 0
+#     for j in i:
+#         if j[0] == 1:
+#             count+=1
+#     temp_list = ([0]*21)
+#     temp_list[count]=1
+#     train_output.append(temp_list)
+#
+# test_input = train_input[NUM_EXAMPLES:]
+# test_output = train_output[NUM_EXAMPLES:]
+# train_input = train_input[:NUM_EXAMPLES]
+# train_output = train_output[:NUM_EXAMPLES]
+#
+# print ("test and training data loaded")
 
 
 data = tf.placeholder(tf.float32, [None, 20,1]) #Number of examples, number of input, dimension of each input

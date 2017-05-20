@@ -1,6 +1,9 @@
 sequence_length: 3
-number_of_features: 25
-data_size: 5
+number_features: 25
+data_size: 10000
+test_percentage: 0.2
 sequence_time_diff: 3
 label_time_diff: 24
 number_hidden: 35
+number_epoch: 5
+batch_size: 500

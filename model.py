@@ -17,10 +17,14 @@ def lazy_property(function):
 
 class ModelLSTM(object):
 
-    def __init__(self, data, labels, conf):
-        self.data = data
-        self.labels = labels
+    def __init__(self, conf):
         self.conf = conf
+        self.data = tf.placeholder(tf.float32, [None, self.conf['sequence_length'], self.conf['number_features']])
+        self.labels = tf.placeholder(tf.float32, [None, self.conf['number_features']])
+
+    @lazy_property
+    def conf(self):
+        return self.conf
 
     @lazy_property
     def data(self):
@@ -31,15 +35,9 @@ class ModelLSTM(object):
         return self.labels
 
     @lazy_property
-    def conf(self):
-        return self.conf
-
-    @lazy_property
     def inference(self):
-        data = tf.placeholder(tf.float32, [None, self.conf['sequence_length'], self.conf['number_of_features']])
-        labels = tf.placeholder(tf.float32, [None, self.conf['number_of_features']])
         cell = tf.contrib.rnn.BasicLSTMCell(self.conf['number_hidden'], state_is_tuple = True)
-        val, _ = tf.nn.dynamic_rnn(cell, data, dtype = tf.float32)
+        val, _ = tf.nn.dynamic_rnn(cell, self.data, dtype = tf.float32)
         val = tf.transpose(val, [1, 0, 2])
         last = tf.gather(val, int(val.get_shape()[0]) - 1)
         last_activated = tf.nn.relu(last)
@@ -49,12 +47,15 @@ class ModelLSTM(object):
         return tf.matmul(last_activated, weight) + bias
 
     @lazy_property
-    def optimzer(self):
+    def optimizer(self):
         l2_loss = tf.reduce_mean(tf.squared_difference(self.inference, self.labels))
         optimizer = tf.train.AdamOptimizer()
         return optimizer.minimize(l2_loss)
 
     @lazy_property
     def error(self):
-        pass
+        return tf.reduce_mean(tf.squared_difference(self.inference, self.labels))
 
+    @lazy_property
+    def init(self):
+        return tf.global_variables_initializer()
