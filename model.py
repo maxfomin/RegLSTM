@@ -1,5 +1,6 @@
 import tensorflow as tf
 import functools
+import yaml
 
 
 def lazy_property(function):
@@ -17,22 +18,27 @@ def lazy_property(function):
 
 class ModelLSTM(object):
 
-    def __init__(self, conf):
-        self.conf = conf
+    def __init__(self):
+        with open('definitions.yml', 'r') as f:
+            self.conf = yaml.load(f)
         self.data = tf.placeholder(tf.float32, [None, self.conf['sequence_length'], self.conf['number_features']])
         self.labels = tf.placeholder(tf.float32, [None, self.conf['number_features']])
+        # self.inference
+        # self.optimizer
+        # self.error
+        # self.init
 
-    @lazy_property
-    def conf(self):
-        return self.conf
-
-    @lazy_property
-    def data(self):
-        return self.data
-
-    @lazy_property
-    def labels(self):
-        return self.labels
+    # @lazy_property
+    # def conf(self):
+    #     return self.conf
+    #
+    # @lazy_property
+    # def data(self):
+    #     return self.data
+    #
+    # @lazy_property
+    # def labels(self):
+    #     return self.labels
 
     @lazy_property
     def inference(self):
@@ -42,8 +48,8 @@ class ModelLSTM(object):
         last = tf.gather(val, int(val.get_shape()[0]) - 1)
         last_activated = tf.nn.relu(last)
 
-        weight = tf.Variable(tf.truncated_normal([self.conf['number_hidden'], int(labels.get_shape()[1])]))
-        bias = tf.Variable(tf.constant(0.1, shape = [labels.get_shape()[1]]))
+        weight = tf.Variable(tf.truncated_normal([self.conf['number_hidden'], int(self.labels.get_shape()[1])]))
+        bias = tf.Variable(tf.constant(0.1, shape = [self.labels.get_shape()[1]]))
         return tf.matmul(last_activated, weight) + bias
 
     @lazy_property

@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import yaml
 
 class FeatureVector(object):
 
@@ -12,9 +13,12 @@ class FeatureVector(object):
 	def __repr__(self):
 		return 'ID: {0}'.format(self.ID)
 
+	def __getitem__(self, index):
+		return self.features[index]
+
 	@property
 	def features(self):
-		return self._data
+		return self._features
 
 	@features.setter
 	def features(self, value):
@@ -63,17 +67,27 @@ class InfoMatrix(object):
 class DataStruct(object):
 
 	def __init__(self, data, labels):
+		with open('definitions.yml', 'r') as f:
+			self._conf = yaml.load(f)
 		self._data = []
 		self._labels = []
-		self._test_size = int(conf['data_size'] * conf['test_percentage'])
+		self._raw_data = data
+		self._raw_labels = labels
+		self._test_size = int(self._conf['data_size'] * self._conf['test_percentage'])
+		self._max_values = np.maximum(np.max(data, (0, 1)), np.max(labels, 0))
+		self._min_values = np.minimum(np.min(data, (0, 1)), np.min(labels, 0))
+
+		data, labels = self._normalize(data, labels)
+
+
 		for data_piece, label in zip(data, labels):
-			self._data.append(InfoMatrix(data_piece))
+			self._data.append([FeatureVector(feature_data) for feature_data in data_piece])
 			self._labels.append(FeatureVector(label))
 
-		random_seed = random.random()
-		random.shuffle(self._data, lambda: random_seed)
-		random.shuffle(self._labels, lambda: random_seed)
-		self.normalize()
+			# self._raw_data.append(data_piece)
+			# self._raw_labels.append(label)
+
+		self._shuffle()
 
 	@property
 	def data(self):
@@ -84,20 +98,51 @@ class DataStruct(object):
 		return self._labels
 
 	@property
+	def raw_data(self):
+		return self._raw_data
+
+	@property
+	def raw_labels(self):
+		return self._raw_labels
+
+	@property
+	def conf(self):
+		return self._conf
+
+	@property
+	def max_values(self):
+	    return self._max_values
+
+	@property
+	def min_values(self):
+	    return self._min_values
+
+	@property
 	def test_size(self):
 		return self._test_size
 
-	def shuffle(self):
-		pass
-
-	def get_batch(self):
-		pass
+	def get_batch(self, batch_number):
+		batch_slice = slice(self.test_size + batch_number * self.conf['batch_size'],
+							self.test_size + (batch_number + 1) * self.conf['batch_size'])
+		# return np.concatenate(self.raw_data[batch_slice]), np.concatenate(self.raw_labels[batch_slice])
+		return self.raw_data[batch_slice], self.raw_labels[batch_slice]
 
 	def get_test(self):
-		return self.data[:self.test_size], self.labels[:self.test_size]
-
-	def normalize(self):
-		pass
+		# return np.concatenate(self.raw_data[:self.test_size]), np.concatenate(self.raw_labels[:self.test_size])
+		return self.raw_data[:self.test_size], self.raw_labels[:self.test_size]
 
 	def denormalize(self):
 		pass
+
+	def _normalize(self, data, labels):
+		for feature_num in range(self.conf['number_features']):
+			data[:, :, feature_num] = (data[:, :, feature_num] - self.min_values[feature_num]) / \
+									  (self.max_values[feature_num] - self.min_values[feature_num])
+			labels[:, feature_num] = (labels[:, feature_num] - self.min_values[feature_num]) / \
+									 (self.max_values[feature_num] - self.min_values[feature_num])
+		return data, labels
+
+	def _shuffle(self):
+		random_seed = random.random()
+		random.shuffle(self._data, lambda: random_seed)
+		random.shuffle(self._labels, lambda: random_seed)
