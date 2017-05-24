@@ -13,10 +13,14 @@ def generate_data():
     function_number = [1, 2]
 
     for ind_feature in range(conf['number_features']):
-        gen_number = randint(1, len(function_number))
-        gen_function = [randint(0, len(function_pool) - 1) for _ in range(gen_number + 1)]
-        gen_amp = [randint(1, 10) for _ in range(gen_number + 1)]
-        gen_freq = [randint(1, 100) for _ in range(gen_number + 1)]
+        # gen_number = randint(1, len(function_number))
+        # gen_function = [randint(0, len(function_pool) - 1) for _ in range(gen_number + 1)]
+        # gen_amp = [randint(1, 10) for _ in range(gen_number + 1)]
+        # gen_freq = [randint(1, 100) for _ in range(gen_number + 1)]
+        gen_number = np.random.randint(1, len(function_number) + 1)
+        gen_function = np.random.choice([i for i in range(len(function_pool))], gen_number, replace = False)
+        gen_amp = np.random.randint(1, 11, len(function_pool))
+        gen_freq = np.random.randint(1, 101, len(function_pool))
         for ind_data in range(conf['data_size']):
             start_time = randint(1, 5000)
             time_series = [start_time + i * conf['sequence_time_diff'] for i in range(conf['sequence_length'])]

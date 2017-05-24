@@ -71,14 +71,12 @@ class DataStruct(object):
 			self._conf = yaml.load(f)
 		self._data = []
 		self._labels = []
-		self._raw_data = data
-		self._raw_labels = labels
 		self._test_size = int(self._conf['data_size'] * self._conf['test_percentage'])
 		self._max_values = np.maximum(np.max(data, (0, 1)), np.max(labels, 0))
 		self._min_values = np.minimum(np.min(data, (0, 1)), np.min(labels, 0))
-
 		data, labels = self._normalize(data, labels)
-
+		self._raw_data = data
+		self._raw_labels = labels
 
 		for data_piece, label in zip(data, labels):
 			self._data.append([FeatureVector(feature_data) for feature_data in data_piece])
@@ -93,17 +91,33 @@ class DataStruct(object):
 	def data(self):
 	    return self._data
 
+	@data.setter
+	def data(self, value):
+		self._data = value
+
 	@property
 	def labels(self):
 		return self._labels
+
+	@labels.setter
+	def labels(self, value):
+		self._labels = value
 
 	@property
 	def raw_data(self):
 		return self._raw_data
 
+	@raw_data.setter
+	def raw_data(self, value):
+		self._raw_data = value
+
 	@property
 	def raw_labels(self):
 		return self._raw_labels
+
+	@raw_labels.setter
+	def raw_labels(self, value):
+		self._raw_labels = value
 
 	@property
 	def conf(self):
@@ -122,10 +136,9 @@ class DataStruct(object):
 		return self._test_size
 
 	def get_batch(self, batch_number):
-		batch_slice = slice(self.test_size + batch_number * self.conf['batch_size'],
-							self.test_size + (batch_number + 1) * self.conf['batch_size'])
-		# return np.concatenate(self.raw_data[batch_slice]), np.concatenate(self.raw_labels[batch_slice])
-		return self.raw_data[batch_slice], self.raw_labels[batch_slice]
+		indices = np.random.choice(np.arange(self.test_size, self.conf['data_size']),
+								   self.conf['batch_size'], replace = False)
+		return np.take(self.raw_data, indices, 0), np.take(self.raw_labels, indices, 0)
 
 	def get_test(self):
 		# return np.concatenate(self.raw_data[:self.test_size]), np.concatenate(self.raw_labels[:self.test_size])
@@ -143,6 +156,12 @@ class DataStruct(object):
 		return data, labels
 
 	def _shuffle(self):
-		random_seed = random.random()
-		random.shuffle(self._data, lambda: random_seed)
-		random.shuffle(self._labels, lambda: random_seed)
+		data_list = [self.data, self.labels, self.raw_data, self.raw_labels]
+		shuffle_indices = np.arange(self.conf['data_size'], dtype = np.int)
+		np.random.shuffle(shuffle_indices)
+		for ind, data in enumerate(data_list):
+			data = np.array(data)
+			data = data[shuffle_indices]
+			if ind > 1:
+				data = np.ndarray.tolist(data)
+		self.data, self.labels, self.raw_data, self.raw_labels = data_list

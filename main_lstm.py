@@ -34,7 +34,7 @@ def main():
         test_data, test_labels = data_struct.get_test()
         epoch_error = sess.run(error, {lstm_nn.data: test_data, lstm_nn.labels: test_labels})
         time_stop = time.clock()
-        print('Epoch {0}: time is {1} sec, error is {2}\n'.format(i + 1, time_stop - time_start, epoch_error))
+        print('Epoch {}: time is {:.1f} sec, error is {:.4f}\n'.format(i + 1, time_stop - time_start, epoch_error))
 
 
 if __name__ == '__main__':
