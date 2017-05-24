@@ -4,6 +4,6 @@ data_size: 10000
 test_percentage: 0.2
 sequence_time_diff: 3
 label_time_diff: 24
-number_hidden: 25
+number_hidden: 50
 number_epoch: 50
 batch_size: 100
