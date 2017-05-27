@@ -11,6 +11,7 @@ def generate_data():
     labels = np.zeros((conf['data_size'], conf['number_features']), dtype = np.float16)
     function_pool = [math.sin, math.cos]
     function_number = [1, 2]
+    start_time = np.random.randint(1, 3001, conf['data_size'])
 
     for ind_feature in range(conf['number_features']):
         # gen_number = randint(1, len(function_number))
@@ -22,8 +23,8 @@ def generate_data():
         gen_amp = np.random.randint(1, 11, len(function_pool))
         gen_freq = np.random.randint(1, 101, len(function_pool))
         for ind_data in range(conf['data_size']):
-            start_time = randint(1, 5000)
-            time_series = [start_time + i * conf['sequence_time_diff'] for i in range(conf['sequence_length'])]
+            # start_time = randint(1, 3000)
+            time_series = [start_time[ind_data] + i * conf['sequence_time_diff'] for i in range(conf['sequence_length'])]
             labels[ind_data, ind_feature] = sum([gen_amp[ind] * function_pool[ind]
             (gen_freq[ind] * (time_series[-1] + conf['label_time_diff'])) for ind in gen_function])
 

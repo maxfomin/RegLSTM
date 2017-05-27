@@ -5,6 +5,7 @@ import tensorflow as tf
 import yaml
 import time
 
+
 def main():
     with open('definitions.yml', 'r') as f:
         conf = yaml.load(f)
@@ -38,8 +39,8 @@ def main():
 
     single_data, single_label = data_struct.get_single()
     inference_result = sess.run(inference, {lstm_nn.data: single_data, lstm_nn.labels: single_label})
-    print(database.denormalize(single_label, data_struct.max_values, data_struct.min_values))
-    print(database.denormalize(inference_result, data_struct.max_values, data_struct.min_values))
+    print('{.2f}'.format(database.denormalize(single_label, data_struct.max_values, data_struct.min_values)))
+    print('{.2f}'.format(database.denormalize(inference_result, data_struct.max_values, data_struct.min_values)))
 
 if __name__ == '__main__':
     main()
