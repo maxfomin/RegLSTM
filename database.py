@@ -144,7 +144,7 @@ class DataStruct(object):
 		return self._test_size
 
 	def get_batch(self):
-		indices = np.random.choice(np.arange(self.valid_size, self.conf['data_size']),
+		indices = np.random.choice(np.arange(self.valid_size + self.test_size, self.conf['data_size']),
 								   self.conf['batch_size'], replace = False)
 		return np.take(self.raw_data, indices, 0), np.take(self.raw_labels, indices, 0)
 

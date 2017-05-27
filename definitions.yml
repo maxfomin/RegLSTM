@@ -9,7 +9,7 @@ number_hidden:
   - 30
   - 50
   - 100
-keep_probability: 1
+keep_probability: 0.9
 number_epoch: 50
 batch_size: 75
 
