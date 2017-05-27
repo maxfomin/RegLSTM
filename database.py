@@ -3,7 +3,7 @@ import random
 import yaml
 
 def denormalize(vec, max_values, min_values):
-    return np.ndarray.tolist(np.multiply(vec, max_values - min_values) + min_values)
+    return np.ndarray.tolist(np.multiply(vec, max_values - min_values) + min_values)[0]
 
 class FeatureVector(object):
 
@@ -74,7 +74,8 @@ class DataStruct(object):
 			self._conf = yaml.load(f)
 		self._data = []
 		self._labels = []
-		self._test_size = int(self._conf['data_size'] * self._conf['test_percentage'])
+		self._valid_size = int(self._conf['validation_size'])
+		self._test_size = int(self._conf['test_size'])
 		self._max_values = np.maximum(np.max(data, (0, 1)), np.max(labels, 0))
 		self._min_values = np.minimum(np.min(data, (0, 1)), np.min(labels, 0))
 		data, labels = self._normalize(data, labels)
@@ -135,17 +136,25 @@ class DataStruct(object):
 	    return self._min_values
 
 	@property
+	def valid_size(self):
+		return self._valid_size
+
+	@property
 	def test_size(self):
 		return self._test_size
 
 	def get_batch(self):
-		indices = np.random.choice(np.arange(self.test_size, self.conf['data_size']),
+		indices = np.random.choice(np.arange(self.valid_size, self.conf['data_size']),
 								   self.conf['batch_size'], replace = False)
 		return np.take(self.raw_data, indices, 0), np.take(self.raw_labels, indices, 0)
 
 	def get_test(self):
-		# return np.concatenate(self.data[:self.test_size]), np.concatenate(self.labels[:self.test_size])
+		# return np.concatenate(self.data[:self.valid_size]), np.concatenate(self.labels[:self.valid_size])
 		return self.raw_data[:self.test_size], self.raw_labels[:self.test_size]
+
+	def get_validation(self):
+		return self.raw_data[self.test_size:self.test_size + self.valid_size],\
+			   self.raw_labels[self.test_size:self.test_size + self.valid_size]
 
 	def get_single(self):
 		index = np.random.randint(self.conf['data_size'])

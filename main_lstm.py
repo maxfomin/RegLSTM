@@ -15,7 +15,7 @@ def main():
     del data, labels
     print('Data has been generated\n')
 
-    number_batches = int(conf['data_size'] * (1 - conf['test_percentage']) / conf['batch_size'])
+    number_batches = int((conf['data_size'] - conf['validation_size'] - conf['test_size']) / conf['batch_size'])
     lstm_nn = model.ModelLSTM()
     inference = lstm_nn.inference
     minimize = lstm_nn.optimizer
@@ -32,15 +32,18 @@ def main():
             batch_data, batch_labels = data_struct.get_batch()
             sess.run(minimize, {lstm_nn.data: batch_data, lstm_nn.labels: batch_labels})
 
-        test_data, test_labels = data_struct.get_test()
+        test_data, test_labels = data_struct.get_validation()
         epoch_error = sess.run(error, {lstm_nn.data: test_data, lstm_nn.labels: test_labels})
         time_stop = time.clock()
-        print('Epoch {}: time is {:.1f} sec, error is {:.4f}\n'.format(i + 1, time_stop - time_start, epoch_error))
+        print('Epoch {}: time is {:.1f} sec, error is {:.6f}\n'.format(i + 1, time_stop - time_start, epoch_error))
 
     single_data, single_label = data_struct.get_single()
     inference_result = sess.run(inference, {lstm_nn.data: single_data, lstm_nn.labels: single_label})
-    print('{.2f}'.format(database.denormalize(single_label, data_struct.max_values, data_struct.min_values)))
-    print('{.2f}'.format(database.denormalize(inference_result, data_struct.max_values, data_struct.min_values)))
+    denormed_label = database.denormalize(single_label, data_struct.max_values, data_struct.min_values)
+    denormed_result = database.denormalize(inference_result, data_struct.max_values, data_struct.min_values)
+    print('Label    Result\n')
+    for label, result in zip(denormed_label, denormed_result):
+        print('{:.2f}   {:.2f}\n'.format(label, result))
 
 if __name__ == '__main__':
     main()

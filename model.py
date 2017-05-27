@@ -23,32 +23,20 @@ class ModelLSTM(object):
             self.conf = yaml.load(f)
         self.data = tf.placeholder(tf.float32, [None, self.conf['sequence_length'], self.conf['number_features']])
         self.labels = tf.placeholder(tf.float32, [None, self.conf['number_features']])
-        # self.inference
-        # self.optimizer
-        # self.error
-        # self.init
-
-    # @lazy_property
-    # def conf(self):
-    #     return self.conf
-    #
-    # @lazy_property
-    # def data(self):
-    #     return self.data
-    #
-    # @lazy_property
-    # def labels(self):
-    #     return self.labels
 
     @lazy_property
     def inference(self):
-        cell = tf.contrib.rnn.BasicLSTMCell(self.conf['number_hidden'], state_is_tuple = True)
-        val, _ = tf.nn.dynamic_rnn(cell, self.data, dtype = tf.float32)
+        #cell = tf.contrib.rnn.BasicLSTMCell(self.conf['number_hidden'], state_is_tuple = True)
+        cells = [tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.BasicLSTMCell(number_hidden, state_is_tuple = True),
+                                               output_keep_prob = self.conf['keep_probability'])
+                 for number_hidden in self.conf['number_hidden']]
+        stacked_lstm = tf.contrib.rnn.MultiRNNCell(cells, state_is_tuple=True)
+        val, _ = tf.nn.dynamic_rnn(stacked_lstm, self.data, dtype = tf.float32)
         val = tf.transpose(val, [1, 0, 2])
         last = tf.gather(val, int(val.get_shape()[0]) - 1)
         last_activated = tf.nn.relu(last)
 
-        weight = tf.Variable(tf.truncated_normal([self.conf['number_hidden'], int(self.labels.get_shape()[1])]))
+        weight = tf.Variable(tf.truncated_normal([self.conf['number_hidden'][-1], int(self.labels.get_shape()[1])]))
         bias = tf.Variable(tf.constant(0.1, shape = [self.labels.get_shape()[1]]))
         return tf.matmul(last_activated, weight) + bias
 

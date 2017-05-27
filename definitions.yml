@@ -1,9 +1,15 @@
 sequence_length: 3
 number_features: 25
 data_size: 10000
-test_percentage: 0.2
+test_size: 1000
+validation_size: 1000
 sequence_time_diff: 3
 label_time_diff: 24
-number_hidden: 50
+number_hidden:
+  - 30
+  - 50
+  - 100
+keep_probability: 1
 number_epoch: 50
-batch_size: 100
+batch_size: 75
+
